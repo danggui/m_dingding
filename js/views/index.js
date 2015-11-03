@@ -1,4 +1,4 @@
-define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyProfileStore','EnvStore','UILoading','LanguageStore','UIArticle','DDloginFromPartnerModel'], function (View, viewhtml,UIToast,LoginModel,MyProfileStore,EnvStore,UILoading,LanguageStore,UIArticle,DDloginFromPartnerModel) {
+﻿define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyProfileStore','EnvStore','UILoading','LanguageStore','UIArticle','DDloginFromPartnerModel'], function (View, viewhtml,UIToast,LoginModel,MyProfileStore,EnvStore,UILoading,LanguageStore,UIArticle,DDloginFromPartnerModel) {
 
     //判断访问终端
     var version = '1.0.0';
@@ -55,18 +55,15 @@ define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyP
                 var device = 'ios'
             }
 
-
-            this.$el.html(viewhtml);
-            this.$("#self-service").append(_.template(this.$("#basic_info_tp0").html())({'lanStore':lanStore.getAttr('language')}));
             // en_us/zh_cn/zh_tw
             var type=navigator.appName
 
-                if (type=="Netscape"){
-                    lang = navigator.language.toLowerCase().replace("-","_")
-                }
-                else{
-                    lang = navigator.userLanguage.toLowerCase().replace("-","_")
-                }
+            if (type=="Netscape"){
+                lang = navigator.language.toLowerCase().replace("-","_")
+            }
+            else{
+                lang = navigator.userLanguage.toLowerCase().replace("-","_")
+            }
 
 
             $.ajax({
@@ -76,12 +73,11 @@ define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyP
                 success: function (data) {
                     lanStore.setAttr('language',data.data);
                     //this.$("#login").append(_.template(this.$("#login-language").html())({'lanStore':lanStore.getAttr('language')}));
-
                     //get workid & client_code START
                     var params = location.href.split('?')[1].split('&')
 
                     _.each(params,function(value, key, list){
-                        if (value.includes('employeeId')){
+                        if (value.indexOf('employeeId')==0){
                             workid = value.split('=')[1];
                         }else{
                             client_code = value.split('=')[1];
@@ -89,6 +85,8 @@ define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyP
                     });
 
                     //get workid & client_code END
+                    scope.$el.html(viewhtml);
+                    this.$("#self-service").append(_.template(this.$("#basic_info_tp0").html())({'lanStore':lanStore.getAttr('language')}));
 
                     // get dingding Login START
                     if (!this.toast1) {
@@ -121,7 +119,7 @@ define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyP
                         this,
                         function(e){},
                         {'client_code':client_code,
-                              'workid':workid
+                            'workid':workid
                         }
                     );
                     // get dingding Login END
@@ -132,69 +130,6 @@ define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyP
                     console.log('Language Ajax error!');
                 }
             });
-            function eventBackButton(){
-
-                if($("#view_1").css("display")=="block"){
-
-                    if (!this.toast1) {
-                        this.toast1 = new UIToast({
-                            datamodel: {
-                                content: 'content'
-                            },
-                            TIMERRES :  true
-                        });
-                    }
-                    this.toast1.showToast(lanStore.getAttr('language').quiteAppError);
-                    document.removeEventListener("backbutton", eventBackButton, false); // 注销返回键
-                    document.addEventListener("backbutton", exitApp, false);// 绑定退出事件
-                    //3秒后重新注册
-                    var intervalID = window.setInterval(
-                        function() {
-                            window.clearInterval(intervalID);
-                            document.removeEventListener("backbutton",exitApp, false); // 注销返回键
-                            document.addEventListener("backbutton", eventBackButton, false); // 返回键
-                        },3000);
-                }else if($("#view_6").css("display")=="block"){
-
-                }else {
-                    navigator.app.backHistory();
-                }
-            }
-            function onOffline(){
-                if (!this.toast1) {
-                    this.toast1 = new UIToast({
-                        datamodel: {
-                            content: 'content'
-                        },
-                        TIMERRES :  true
-                    });
-                }
-                this.toast1.showToast(lanStore.getAttr('language').networkStates);
-                //$("#main").append("<div style='display: flex;justify-content: center;padding: 10px;background: rgb(255, 62, 62);color: white;'><h2>"+lanStore.getAttr('language').networkState+"</h2></div>")
-            }
-            function onOnline(){
-                if (!this.toast1) {
-                    this.toast1 = new UIToast({
-                        datamodel: {
-                            content: 'content'
-                        },
-                        TIMERRES :  true
-                    });
-                }
-                this.toast1.showToast(lanStore.getAttr('language').networkStates);
-                //$("#main").append("<div style='display: flex;justify-content: center;padding: 10px;background: rgb(255, 62, 62);color: white;'><h2>"+lanStore.getAttr('language').networkState+"</h2></div>")
-            }
-            //退出app
-            function exitApp() {
-                navigator.app.exitApp();
-            }
-
-            document.addEventListener("deviceready",
-                function(){
-                    document.addEventListener("offline", onOffline, false);
-                    document.addEventListener("online", onOnline, false);
-                    document.addEventListener("backbutton",eventBackButton,false); //返回键
-                }, false);
         },
 
         events: {
@@ -234,7 +169,7 @@ define(['AbstractView', getViewTemplatePath('login'),'UIToast','LoginModel','MyP
         },
 
         onShow: function () {
-            
+
         },
 
         onHide: function () {
